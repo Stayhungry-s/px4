@@ -12,9 +12,12 @@ from px4_msgs.msg import TrajectorySetpoint
 from px4_msgs.msg import VehicleCommand
 from px4_msgs.msg import VehicleStatus
 
+# MAVLink/PX4 mode configuration constants used with VEHICLE_CMD_DO_SET_MODE.
 MAV_MODE_FLAG_CUSTOM_MODE_ENABLED = 1
 PX4_CUSTOM_MAIN_MODE_OFFBOARD = 6
-COMPONENT_ARM = 1
+
+# VEHICLE_CMD_COMPONENT_ARM_DISARM action parameter: 1 = arm, 0 = disarm.
+ARM_ACTION = 1
 
 
 class OffboardControlNode(Node):
@@ -125,7 +128,7 @@ class OffboardControlNode(Node):
             )
             self._publish_vehicle_command(
                 VehicleCommand.VEHICLE_CMD_COMPONENT_ARM_DISARM,
-                COMPONENT_ARM,
+                ARM_ACTION,
             )
             self._arm_and_mode_sent = True
             self.get_logger().info(
