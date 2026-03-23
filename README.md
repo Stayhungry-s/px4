@@ -2,22 +2,22 @@
 
 ## offboard_control_ros2
 
-本仓库新增了一个基于 ROS2 架构的 offboard 模块（`offboard_control_ros2`），用于通过 PX4 ROS2 接口发布 offboard 控制消息。
+This repository now includes a ROS2-based offboard module (`offboard_control_ros2`) for publishing PX4 offboard control messages.
 
-### 功能
+### Features
 
-- 周期发布 `/fmu/in/offboard_control_mode`
-- 周期发布 `/fmu/in/trajectory_setpoint`
-- 达到设定次数后发送 `/fmu/in/vehicle_command` 进入 OFFBOARD 并解锁
-- 订阅 `/fmu/out/vehicle_status` 获取飞控状态
+- Periodically publishes `/fmu/in/offboard_control_mode`
+- Periodically publishes `/fmu/in/trajectory_setpoint`
+- Sends `/fmu/in/vehicle_command` to switch to OFFBOARD and arm after a configurable number of setpoints
+- Subscribes to `/fmu/out/vehicle_status` to monitor flight controller state
 
-### 目录
+### Files
 
 - `offboard_control_ros2/offboard_control_ros2/offboard_node.py`
 - `offboard_control_ros2/launch/offboard_control.launch.py`
 - `offboard_control_ros2/config/offboard_params.yaml`
 
-### 使用
+### Usage
 
 ```bash
 cd <workspace_root>
