@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import Optional
+from typing import List, Optional
 
 import rclpy
 from rclpy.node import Node
@@ -131,7 +131,7 @@ class OffboardControlNode(Node):
             )
 
 
-def main(args: Optional[list[str]] = None) -> None:
+def main(args: Optional[List[str]] = None) -> None:
     rclpy.init(args=args)
     node = OffboardControlNode()
     try:
