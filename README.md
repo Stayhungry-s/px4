@@ -13,14 +13,14 @@
 
 ### 目录
 
-- `/home/runner/work/px4/px4/offboard_control_ros2/offboard_control_ros2/offboard_node.py`
-- `/home/runner/work/px4/px4/offboard_control_ros2/launch/offboard_control.launch.py`
-- `/home/runner/work/px4/px4/offboard_control_ros2/config/offboard_params.yaml`
+- `offboard_control_ros2/offboard_control_ros2/offboard_node.py`
+- `offboard_control_ros2/launch/offboard_control.launch.py`
+- `offboard_control_ros2/config/offboard_params.yaml`
 
 ### 使用
 
 ```bash
-cd /home/runner/work/px4/px4
+cd <workspace_root>
 colcon build --packages-select offboard_control_ros2
 source install/setup.bash
 ros2 launch offboard_control_ros2 offboard_control.launch.py
