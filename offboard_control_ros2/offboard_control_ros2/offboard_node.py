@@ -12,6 +12,10 @@ from px4_msgs.msg import TrajectorySetpoint
 from px4_msgs.msg import VehicleCommand
 from px4_msgs.msg import VehicleStatus
 
+MAV_MODE_FLAG_CUSTOM_MODE_ENABLED = 1.0
+PX4_CUSTOM_MAIN_MODE_OFFBOARD = 6.0
+COMPONENT_ARM = 1.0
+
 
 class OffboardControlNode(Node):
     def __init__(self) -> None:
@@ -114,16 +118,14 @@ class OffboardControlNode(Node):
         arm_after_setpoints = int(self.get_parameter('arm_after_setpoints').value)
 
         if not self._arm_and_mode_sent and self._setpoint_counter >= arm_after_setpoints:
-            # param1=1.0 -> MAV_MODE_FLAG_CUSTOM_MODE_ENABLED
-            # param2=6.0 -> PX4_CUSTOM_MAIN_MODE_OFFBOARD
             self._publish_vehicle_command(
                 VehicleCommand.VEHICLE_CMD_DO_SET_MODE,
-                1.0,
-                6.0,
+                MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
+                PX4_CUSTOM_MAIN_MODE_OFFBOARD,
             )
             self._publish_vehicle_command(
                 VehicleCommand.VEHICLE_CMD_COMPONENT_ARM_DISARM,
-                1.0,
+                COMPONENT_ARM,
             )
             self._arm_and_mode_sent = True
             self.get_logger().info(
