@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from typing import List, Optional
+from typing import Optional
 
 import rclpy
 from rclpy.node import Node
@@ -127,7 +127,7 @@ class OffboardControlNode(Node):
             self.get_logger().info('Sent OFFBOARD mode request and arm command.')
 
 
-def main(args: Optional[List[str]] = None) -> None:
+def main(args: Optional[list[str]] = None) -> None:
     rclpy.init(args=args)
     node = OffboardControlNode()
     try:
