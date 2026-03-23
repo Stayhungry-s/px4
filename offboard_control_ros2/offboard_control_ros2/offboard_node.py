@@ -66,7 +66,7 @@ class OffboardControlNode(Node):
         self.get_logger().info('OffboardControlNode started.')
 
     def _timestamp_us(self) -> int:
-        return int(self.get_clock().now().nanoseconds / 1000)
+        return int(self.get_clock().now().nanoseconds // 1000)
 
     def _vehicle_status_callback(self, msg: VehicleStatus) -> None:
         self._nav_state = msg.nav_state
