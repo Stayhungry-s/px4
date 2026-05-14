@@ -33,6 +33,7 @@ class PrecisionLandingNode(Node):
         self.declare_parameter('align_threshold_m', 0.15)
         self.declare_parameter('max_horizontal_step_m', 0.5)
         self.declare_parameter('descend_step_m', 0.15)
+        self.declare_parameter('max_setpoint_deviation_m', 10.0)
         self.declare_parameter('target_yaw_rad', 0.0)
 
         qos = QoSProfile(
@@ -66,6 +67,15 @@ class PrecisionLandingNode(Node):
         self._sp_x = float(self.get_parameter('hold_x').value)
         self._sp_y = float(self.get_parameter('hold_y').value)
         self._sp_z = float(self.get_parameter('approach_height_m').value)
+        self._hold_x = self._sp_x
+        self._hold_y = self._sp_y
+        self._max_setpoint_deviation_m = float(
+            self.get_parameter('max_setpoint_deviation_m').value
+        )
+        self._descend_step_m = float(self.get_parameter('descend_step_m').value)
+        if self._descend_step_m < 0.0:
+            self.get_logger().warning('descend_step_m is negative; using 0.0.')
+            self._descend_step_m = 0.0
 
         self._setpoint_counter = 0
         self._arm_and_mode_sent = False
@@ -122,6 +132,15 @@ class PrecisionLandingNode(Node):
     def _clamp(value: float, min_value: float, max_value: float) -> float:
         return max(min(value, max_value), min_value)
 
+    @staticmethod
+    def _step_towards(current: float, target: float, step: float) -> float:
+        if step <= 0.0:
+            return current
+        delta = target - current
+        if abs(delta) <= step:
+            return target
+        return current + step if delta > 0.0 else current - step
+
     def _target_is_fresh(self) -> bool:
         if self._target_time_s is None:
             return False
@@ -134,16 +153,30 @@ class PrecisionLandingNode(Node):
 
         max_horizontal_step_m = float(self.get_parameter('max_horizontal_step_m').value)
         align_threshold_m = float(self.get_parameter('align_threshold_m').value)
-        descend_step_m = float(self.get_parameter('descend_step_m').value)
         landing_height_m = float(self.get_parameter('landing_height_m').value)
 
-        dx = self._clamp(self._target_x, -max_horizontal_step_m, max_horizontal_step_m)
-        dy = self._clamp(self._target_y, -max_horizontal_step_m, max_horizontal_step_m)
-        self._sp_x += dx
-        self._sp_y += dy
-
+        correction_x = self._clamp(
+            self._target_x, -max_horizontal_step_m, max_horizontal_step_m
+        )
+        correction_y = self._clamp(
+            self._target_y, -max_horizontal_step_m, max_horizontal_step_m
+        )
+        self._sp_x += correction_x
+        self._sp_y += correction_y
+        self._sp_x = self._clamp(
+            self._sp_x,
+            self._hold_x - self._max_setpoint_deviation_m,
+            self._hold_x + self._max_setpoint_deviation_m,
+        )
+        self._sp_y = self._clamp(
+            self._sp_y,
+            self._hold_y - self._max_setpoint_deviation_m,
+            self._hold_y + self._max_setpoint_deviation_m,
+        )
         if abs(self._target_x) <= align_threshold_m and abs(self._target_y) <= align_threshold_m:
-            self._sp_z = min(self._sp_z + descend_step_m, landing_height_m)
+            self._sp_z = self._step_towards(
+                self._sp_z, landing_height_m, self._descend_step_m
+            )
             return 'DESCEND'
         return 'ALIGN'
 

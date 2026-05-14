@@ -13,4 +13,5 @@ precision_landing_node:
     align_threshold_m: 0.15
     max_horizontal_step_m: 0.5
     descend_step_m: 0.15
+    max_setpoint_deviation_m: 10.0
     target_yaw_rad: 0.0

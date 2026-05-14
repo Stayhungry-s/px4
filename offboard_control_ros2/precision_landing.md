@@ -1,47 +1,51 @@
-# 视觉精准降落主实现说明
+# Precision Landing Main Implementation
 
-本文档对应主实现代码：`offboard_control_ros2/offboard_control_ros2/precision_landing_node.py`。
+This document describes the main implementation in
+`offboard_control_ros2/offboard_control_ros2/precision_landing_node.py`.
 
-## 1. 节点目标
+## 1. Node objective
 
-`precision_landing_node` 负责将视觉目标偏移量转换为 PX4 可直接使用的 OFFBOARD 轨迹设定点，实现“对准 + 下降”的精准降落控制流程。
+`precision_landing_node` converts visual target offsets into PX4 OFFBOARD
+trajectory setpoints and runs a simple **align + descend** precision-landing flow.
 
-## 2. 输入与输出
+## 2. Inputs and outputs
 
-### 输入（视觉侧）
+### Input (vision side)
 
-- 话题：`/vision/landing_target_offset`
-- 类型：`geometry_msgs/msg/PointStamped`
-- 约定：
-  - `point.x`：目标相对机体的 x 偏移（米）
-  - `point.y`：目标相对机体的 y 偏移（米）
+- Topic: `/vision/landing_target_offset`
+- Type: `geometry_msgs/msg/PointStamped`
+- Convention:
+  - `point.x`: x offset from the vehicle to the landing target (meters)
+  - `point.y`: y offset from the vehicle to the landing target (meters)
 
-### 输出（PX4 侧）
+### Outputs (PX4 side)
 
 - `/fmu/in/offboard_control_mode` (`px4_msgs/msg/OffboardControlMode`)
 - `/fmu/in/trajectory_setpoint` (`px4_msgs/msg/TrajectorySetpoint`)
 - `/fmu/in/vehicle_command` (`px4_msgs/msg/VehicleCommand`)
 
-## 3. 控制流程
+## 3. Control flow
 
-1. 周期发布 OFFBOARD 控制模式和轨迹设定点；
-2. 在预设次数后发送切换 OFFBOARD 与解锁命令；
-3. 接收视觉偏移后进入：
-   - `ALIGN`：先修正水平误差；
-   - `DESCEND`：误差进入阈值后逐步下降；
-   - `HOLD`：目标丢失超时则保持当前位置。
+1. Periodically publish OFFBOARD control mode and trajectory setpoints.
+2. After a configured warmup count, send OFFBOARD mode switch and arm commands.
+3. Based on visual offsets, run the following phases:
+   - `ALIGN`: correct horizontal offset.
+   - `DESCEND`: move altitude setpoint step-by-step toward landing height after alignment.
+   - `HOLD`: keep current setpoint when target timeout occurs.
 
-## 4. 关键参数
+## 4. Key parameters
 
-参数文件：`offboard_control_ros2/config/precision_landing_params.yaml`
+Parameter file:
+`offboard_control_ros2/config/precision_landing_params.yaml`
 
-- `align_threshold_m`：进入下降阶段的对准阈值
-- `descend_step_m`：每次控制周期下降步长
-- `max_horizontal_step_m`：水平每周期最大移动量
-- `target_timeout_sec`：视觉目标超时判定
-- `approach_height_m` / `landing_height_m`：接近高度与最低下降高度
+- `align_threshold_m`: horizontal alignment threshold before descend.
+- `descend_step_m`: altitude step size per control cycle.
+- `max_horizontal_step_m`: max horizontal correction per cycle.
+- `target_timeout_sec`: target freshness timeout.
+- `max_setpoint_deviation_m`: max horizontal drift from hold origin.
+- `approach_height_m` / `landing_height_m`: approach and landing target heights.
 
-## 5. 启动方式
+## 5. Run
 
 ```bash
 cd <workspace_root>
@@ -50,8 +54,9 @@ source install/setup.bash
 ros2 launch offboard_control_ros2 precision_landing.launch.py
 ```
 
-## 6. 对接建议
+## 6. Integration notes
 
-- 视觉节点只需稳定输出目标偏移即可；
-- 建议先在仿真调参，再上实机；
-- 若视觉坐标系与机体系不一致，请在视觉侧或中间转换节点先做坐标变换。
+- The vision node only needs to publish stable target offsets.
+- Tune parameters in simulation before flight tests.
+- If the visual frame is not aligned with the control frame, apply a frame transform
+  in the vision side or an intermediate ROS2 node first.
