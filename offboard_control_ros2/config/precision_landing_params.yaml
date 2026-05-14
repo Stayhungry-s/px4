@@ -1,0 +1,17 @@
+precision_landing_node:
+  ros__parameters:
+    timer_period: 0.05
+    system_id: 1
+    component_id: 1
+    arm_after_setpoints: 10
+    target_timeout_sec: 0.4
+    target_topic: /vision/landing_target_offset
+    hold_x: 0.0
+    hold_y: 0.0
+    approach_height_m: -5.0
+    landing_height_m: -0.6
+    align_threshold_m: 0.15
+    max_horizontal_step_m: 0.5
+    descend_step_m: 0.15
+    max_setpoint_deviation_m: 10.0
+    target_yaw_rad: 0.0

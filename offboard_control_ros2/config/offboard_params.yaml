@@ -1,0 +1,10 @@
+offboard_control_node:
+  ros__parameters:
+    timer_period: 0.1
+    target_x: 0.0
+    target_y: 0.0
+    target_z: -5.0
+    target_yaw_rad: 0.0
+    system_id: 1
+    component_id: 1
+    arm_after_setpoints: 10
