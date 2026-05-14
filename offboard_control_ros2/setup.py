@@ -9,8 +9,14 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        ('share/' + package_name + '/launch', ['launch/offboard_control.launch.py']),
-        ('share/' + package_name + '/config', ['config/offboard_params.yaml']),
+        (
+            'share/' + package_name + '/launch',
+            ['launch/offboard_control.launch.py', 'launch/precision_landing.launch.py'],
+        ),
+        (
+            'share/' + package_name + '/config',
+            ['config/offboard_params.yaml', 'config/precision_landing_params.yaml'],
+        ),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -22,6 +28,7 @@ setup(
     entry_points={
         'console_scripts': [
             'offboard_control_node = offboard_control_ros2.offboard_node:main',
+            'precision_landing_node = offboard_control_ros2.precision_landing_node:main',
         ],
     },
 )

@@ -14,8 +14,12 @@ This repository now includes a ROS2-based offboard module (`offboard_control_ros
 ### Files
 
 - `offboard_control_ros2/offboard_control_ros2/offboard_node.py`
+- `offboard_control_ros2/offboard_control_ros2/precision_landing_node.py`
 - `offboard_control_ros2/launch/offboard_control.launch.py`
+- `offboard_control_ros2/launch/precision_landing.launch.py`
 - `offboard_control_ros2/config/offboard_params.yaml`
+- `offboard_control_ros2/config/precision_landing_params.yaml`
+- `offboard_control_ros2/precision_landing.md`
 
 ### Usage
 
@@ -24,4 +28,10 @@ cd <workspace_root>
 colcon build --packages-select offboard_control_ros2
 source install/setup.bash
 ros2 launch offboard_control_ros2 offboard_control.launch.py
+```
+
+Precision landing mode:
+
+```bash
+ros2 launch offboard_control_ros2 precision_landing.launch.py
 ```
